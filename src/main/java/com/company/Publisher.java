@@ -11,11 +11,14 @@ public class Publisher {
 
     private Connection connection;
     private ConnectionFactory connectionFactory;
-    private String queueName;
+    private final String hostname = "localhost";
+    private final Integer port = 5672;
+    private String queueName = "MY_QUEUE";
+    private String routingName = "my-routing";
+    private String exchangeName = "my-exchange";
 
-    public Publisher(String hostname, Integer port, String queueName) {
-        this.queueName = queueName;
 
+    public Publisher() {
         connectionFactory = new ConnectionFactory();
         connectionFactory.setHost(hostname);
         connectionFactory.setPort(port);
@@ -49,8 +52,12 @@ public class Publisher {
 
         try {
             Channel channel = connection.createChannel();
-            channel.queueDeclare(this.queueName, false, false, false, null);
-            channel.basicPublish("", queueName, null, message.getBytes());
+            channel.exchangeDeclare(exchangeName,"direct", true);
+            channel.queueDeclare(queueName, true, false, false, null);
+            channel.queueBind(queueName, exchangeName, routingName);
+
+            channel.basicPublish(exchangeName, routingName, null, message.getBytes());
+
             channel.close();
         } catch (IOException e) {
             e.printStackTrace();

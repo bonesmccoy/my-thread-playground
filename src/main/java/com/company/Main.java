@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 public class Main {
 
 
+    public static final int NUMBER_OF_MESSAGES = 100000;
+
     public static void main(String[] args) throws InterruptedException {
         final ArrayList<String> symbolList = new ArrayList<String>();
 
@@ -24,12 +26,12 @@ public class Main {
         scanner.nextLine();
 
         final Random random = new Random();
-        final Publisher publisher = new Publisher("localhost",5672, "MY_QUEUE");
+        final Publisher publisher = new Publisher();
 
         long startTime = System.currentTimeMillis();
         if (publisher.openConnection()) {
             ExecutorService exe = Executors.newFixedThreadPool(4);
-            for (Integer i = 0;i < 10000; i++) {
+            for (Integer i = 0; i < NUMBER_OF_MESSAGES; i++) {
                 exe.submit(new Runnable() {
                     public void run() {
                             String symbol = symbolList.get(random.nextInt(4));
